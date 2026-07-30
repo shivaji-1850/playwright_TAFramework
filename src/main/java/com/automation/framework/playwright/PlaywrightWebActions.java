@@ -19,7 +19,14 @@ public class PlaywrightWebActions implements IWebActions {
         this.driverManager = driverManager;
     }
 
-    private Page page() { return driverManager.getPage(); }
+    private Page page() {
+        Page selectedPage = TL_CURRENT_PAGE.get();
+        if (selectedPage != null && !selectedPage.isClosed()) {
+            return selectedPage;
+        }
+        TL_CURRENT_PAGE.remove();
+        return driverManager.getPage();
+    }
 
     private Locator locate(String selector) {
         return currentFrame != null
@@ -140,17 +147,30 @@ public class PlaywrightWebActions implements IWebActions {
     @Override public void switchToNewTab() {
         BrowserContext context = driverManager.getContext();
         List<Page> pages = context.pages();
+        if (pages.isEmpty()) {
+            throw new IllegalStateException("No tabs available to switch.");
+        }
         // Switch to last opened tab
         Page newPage = pages.get(pages.size() - 1);
         TL_CURRENT_PAGE.set(newPage);
     }
 
     @Override public void closeCurrentTab() {
-        page().close();
+        Page currentPage = page();
+        currentPage.close();
+        TL_CURRENT_PAGE.remove();
+
+        List<Page> pages = driverManager.getContext().pages();
+        if (!pages.isEmpty()) {
+            TL_CURRENT_PAGE.set(pages.get(pages.size() - 1));
+        }
     }
 
     @Override public void switchToTabByIndex(int index) {
         List<Page> pages = driverManager.getContext().pages();
+        if (index < 0 || index >= pages.size()) {
+            throw new IllegalArgumentException("Tab index out of range: " + index);
+        }
         TL_CURRENT_PAGE.set(pages.get(index));
     }
 

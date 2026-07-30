@@ -8,8 +8,7 @@ import com.microsoft.playwright.options.Cookie;
 import org.slf4j.Logger;
 
 import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.List;
+import java.util.Collections;
 
 public class PlaywrightDriverManager implements IDriverManager {
 
@@ -111,7 +110,7 @@ public class PlaywrightDriverManager implements IDriverManager {
 
     @Override
     public void addCookies(String name, String value, String domain) {
-        getContext().addCookies((List<Cookie>) new Cookie(name, value).setDomain(domain));
+        getContext().addCookies(Collections.singletonList(new Cookie(name, value).setDomain(domain)));
     }
 
     @Override

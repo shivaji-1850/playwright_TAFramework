@@ -98,7 +98,7 @@ public class PlaywrightWaits implements IWaits {
     public void waitForNavigationComplete(int timeoutMs) {
         log.info("Waiting for navigation to complete: timeout={}ms", timeoutMs);
         try {
-            driverManager.getPage().waitForLoadState(LoadState.valueOf("networkidle"),
+            driverManager.getPage().waitForLoadState(LoadState.NETWORKIDLE,
                     new Page.WaitForLoadStateOptions().setTimeout(timeoutMs));
             log.info("Navigation completed successfully");
         } catch (Exception e) {
@@ -111,12 +111,28 @@ public class PlaywrightWaits implements IWaits {
     public void waitForLoadState(String state, int timeoutMs) {
         log.info("Waiting for page load state: state='{}', timeout={}ms", state, timeoutMs);
         try {
-            driverManager.getPage().waitForLoadState(LoadState.valueOf(state),
+            driverManager.getPage().waitForLoadState(resolveLoadState(state),
                     new Page.WaitForLoadStateOptions().setTimeout(timeoutMs));
             log.info("Page reached load state: '{}'", state);
         } catch (Exception e) {
             log.error("Failed waiting for load state '{}': error={}", state, e.getMessage());
             throw e;
+        }
+    }
+
+    private LoadState resolveLoadState(String state) {
+        if (state == null) {
+            throw new IllegalArgumentException("Load state cannot be null.");
+        }
+        switch (state.trim().toLowerCase()) {
+            case "load":
+                return LoadState.LOAD;
+            case "domcontentloaded":
+                return LoadState.DOMCONTENTLOADED;
+            case "networkidle":
+                return LoadState.NETWORKIDLE;
+            default:
+                throw new IllegalArgumentException("Unsupported load state: " + state);
         }
     }
 

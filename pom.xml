@@ -111,6 +111,15 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>com/playwrightAutomation/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <!-- Build the JAR with sources for IDE support in consumer project -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

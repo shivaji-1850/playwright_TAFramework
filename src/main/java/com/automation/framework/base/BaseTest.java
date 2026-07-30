@@ -1,6 +1,7 @@
 package com.automation.framework.base;
 
 import com.automation.framework.abstractions.*;
+import com.automation.framework.config.ConfigManager;
 import com.automation.framework.factory.DriverFactory;
 import com.automation.framework.logging.FrameworkLogger;
 import com.automation.framework.reporting.ReportManager;
@@ -39,9 +40,13 @@ public abstract class BaseTest {
     public void tearDown(ITestResult result) {
         if (result.getStatus() == ITestResult.FAILURE) {
             log.error("✘ Test FAILED: {}", result.getName());
-            String screenshotPath = "target/screenshots/" + result.getName() + ".png";
-            driver.takeScreenshot(screenshotPath);
-            ReportManager.failWithScreenshot(result.getName(), screenshotPath);
+            if (ConfigManager.getBool("screenshot.on.failure", true)) {
+                String screenshotPath = "target/screenshots/" + result.getName() + ".png";
+                driver.takeScreenshot(screenshotPath);
+                ReportManager.failWithScreenshot(result.getName(), screenshotPath);
+            } else {
+                ReportManager.fail(result.getName());
+            }
         } else {
             log.info("✔ Test PASSED: {}", result.getName());
             ReportManager.pass(result.getName());
