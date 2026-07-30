@@ -4,7 +4,7 @@ import com.microsoft.playwright.APIResponse;
 
 import java.util.Map;
 
-public interface ApiResponse {
+public interface IApiResponse {
     APIResponse getRawResponse();
     int statusCode();
     String body();
@@ -15,3 +15,4 @@ public interface ApiResponse {
     boolean isClientError(); // 4xx
     boolean isServerError(); // 5xx
 }
+

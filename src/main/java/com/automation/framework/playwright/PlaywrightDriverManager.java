@@ -4,10 +4,12 @@ import com.automation.framework.abstractions.*;
 import com.automation.framework.config.ConfigManager;
 import com.automation.framework.logging.FrameworkLogger;
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.Cookie;
 import org.slf4j.Logger;
 
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.List;
 
 public class PlaywrightDriverManager implements IDriverManager {
 
@@ -109,8 +111,7 @@ public class PlaywrightDriverManager implements IDriverManager {
 
     @Override
     public void addCookies(String name, String value, String domain) {
-        getContext().addCookies(java.util.List.of(
-                new com.microsoft.playwright.options.Cookie(name, value).setDomain(domain)));
+        getContext().addCookies((List<Cookie>) new Cookie(name, value).setDomain(domain));
     }
 
     @Override

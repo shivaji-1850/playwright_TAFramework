@@ -1,9 +1,10 @@
 package com.automation.framework.playwright;
 
-import com.automation.framework.abstractions.ApiResponse;
+import com.automation.framework.abstractions.IApiResponse;
 import com.automation.framework.abstractions.IApiContext;
 import com.automation.framework.logging.FrameworkLogger;
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.RequestOptions;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -33,33 +34,31 @@ public class PlaywrightApiContext implements IApiContext {
     @Override public IApiContext body(Object body)               { this.requestBody = body; return this; }
 
     @Override
-    public ApiResponse get(String path) {
+    public IApiResponse get(String path) {
         log.info("GET {}{}", baseUrl, path);
-        APIRequestContext.FetchOptions opts = buildOptions();
-        return new PlaywrightApiResponse(apiContext.get(path, opts));
+        return new PlaywrightApiResponse(apiContext.get(path, buildOptions()));
     }
 
     @Override
-    public ApiResponse post(String path) {
+    public IApiResponse post(String path) {
         log.info("POST {}{}", baseUrl, path);
-        APIRequestContext.FetchOptions opts = buildOptions();
-        return new PlaywrightApiResponse(apiContext.post(path, opts));
+        return new PlaywrightApiResponse(apiContext.post(path, buildOptions()));
     }
 
     @Override
-    public ApiResponse put(String path) {
+    public IApiResponse put(String path) {
         log.info("PUT {}{}", baseUrl, path);
         return new PlaywrightApiResponse(apiContext.put(path, buildOptions()));
     }
 
     @Override
-    public ApiResponse patch(String path) {
+    public IApiResponse patch(String path) {
         log.info("PATCH {}{}", baseUrl, path);
         return new PlaywrightApiResponse(apiContext.patch(path, buildOptions()));
     }
 
     @Override
-    public ApiResponse delete(String path) {
+    public IApiResponse delete(String path) {
         log.info("DELETE {}{}", baseUrl, path);
         return new PlaywrightApiResponse(apiContext.delete(path, buildOptions()));
     }
@@ -67,10 +66,14 @@ public class PlaywrightApiContext implements IApiContext {
     @Override
     public void dispose() { apiContext.dispose(); }
 
-    private APIRequestContext.FetchOptions buildOptions() {
-        APIRequestContext.FetchOptions opts = new APIRequestContext.FetchOptions();
-        if (!headers.isEmpty()) opts.setHeaders(headers);
-        if (requestBody != null) opts.setData(requestBody.toString());
+    private RequestOptions buildOptions() {
+        RequestOptions opts = RequestOptions.create();
+        if (!headers.isEmpty()) {
+            headers.forEach(opts::setHeader);
+        }
+        if (requestBody != null) {
+            opts.setData(requestBody);
+        }
         // Reset per-request body
         requestBody = null;
         return opts;
