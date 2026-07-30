@@ -1,8 +1,11 @@
 package com.automation.framework.abstractions;
 
+import com.microsoft.playwright.APIResponse;
+
 import java.util.Map;
 
 public interface ApiResponse {
+    APIResponse getRawResponse();
     int statusCode();
     String body();
     <T> T as(Class<T> clazz);
